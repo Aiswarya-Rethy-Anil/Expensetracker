@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/etSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Search Expense"
+        android:textColorHint="#A0A0A0"
+        android:background="@drawable/search_bar_background"
+        android:drawableStart="@android:drawable/ic_search_category_default"
+        android:drawablePadding="3dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:imeOptions="actionDone"
+        android:singleLine="true" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="378dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/etSearch"
+        android:paddingBottom="0dp"
+        tools:listitem="@layout/item_expense" />
+
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/btnAddExpense"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/circle_button_background"
+        android:elevation="4dp"
+        android:contentDescription="Add Expense"
+        android:src="@drawable/ic_plus" />
+
+</RelativeLayout>
