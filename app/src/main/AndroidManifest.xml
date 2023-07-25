@@ -9,8 +9,11 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.ExpenseTracker"
+        android:theme="@style/Theme.GroupFCapstoneProject"
         tools:targetApi="31">
+        <activity
+            android:name=".ExpenseActivity"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
