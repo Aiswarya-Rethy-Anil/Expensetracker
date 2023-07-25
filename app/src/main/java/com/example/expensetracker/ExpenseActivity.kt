@@ -1,4 +1,4 @@
-package com.example.groupfcapstoneproject
+package com.example.expensetracker
 
 import android.app.Activity
 import android.content.DialogInterface
@@ -16,7 +16,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.groupfcapstoneproject.Expense
+import com.example.expensetracker.Expense
 
 class ExpenseActivity : AppCompatActivity() {
     private lateinit var etExpenseTitle: EditText

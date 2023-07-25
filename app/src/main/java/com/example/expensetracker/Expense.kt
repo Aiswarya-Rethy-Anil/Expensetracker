@@ -1,4 +1,4 @@
-package com.example.groupfcapstoneproject
+package com.example.expensetracker
 
 import android.os.Parcel
 import android.os.Parcelable

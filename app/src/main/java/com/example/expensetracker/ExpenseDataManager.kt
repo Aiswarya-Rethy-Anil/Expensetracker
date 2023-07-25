@@ -1,4 +1,4 @@
-package com.example.groupfcapstoneproject
+package com.example.expensetracker
 
 import android.content.Context
 import com.google.gson.Gson
