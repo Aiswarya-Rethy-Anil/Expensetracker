@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Type"
+        android:layout_marginBottom="8dp" />
+
+    <Spinner
+        android:id="@+id/spinnerType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/type_options"
+        android:prompt="@string/select_type_prompt"
+        style="@style/SpinnerStyle"
+        android:gravity="center" />
+
+    <EditText
+        android:id="@+id/etExpenseTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Title"
+        android:inputType="text"
+        android:cursorVisible="true"
+        android:textCursorDrawable="@drawable/custom_cursor"
+        tools:text="Sample Expense"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/etExpenseAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Amount"
+        android:inputType="numberDecimal"
+        android:cursorVisible="true"
+        android:textCursorDrawable="@drawable/custom_cursor"
+        android:digits="0123456789."
+        android:maxLength="6"
+        tools:text="10.0"
+        android:layout_marginBottom="18dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Income/Expense category"
+        android:layout_marginBottom="8dp" />
+
+    <Spinner
+        android:id="@+id/spinnerCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/income_category_options"
+        android:prompt="@string/choose_category"
+        style="@style/SpinnerStyle"
+        android:gravity="center"
+        android:layout_marginBottom="18dp"
+        android:enabled="false" />
+
+    <Button
+        android:id="@+id/btnSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:enabled="false" />
+
+</LinearLayout>
