@@ -163,7 +163,7 @@
 //        return super.onOptionsItemSelected(item)
 //    }
 //}
-package com.example.groupfcapstoneproject
+package com.example.expensetracker
 
 import android.app.Activity
 import android.content.DialogInterface

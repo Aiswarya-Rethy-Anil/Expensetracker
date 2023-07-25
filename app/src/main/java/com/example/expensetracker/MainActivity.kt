@@ -162,7 +162,7 @@
 
 
 
-package com.example.groupfcapstoneproject
+package com.example.expensetracker
 
 import android.app.Activity
 import android.content.DialogInterface
@@ -180,7 +180,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
+//import com.google.gson.Gson
 
 class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
