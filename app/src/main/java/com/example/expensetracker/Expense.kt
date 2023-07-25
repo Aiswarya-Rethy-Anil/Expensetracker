@@ -1,9 +1,10 @@
-package com.example.expensetracker
+package com.example.groupfcapstoneproject
 
 import android.os.Parcel
 import android.os.Parcelable
 
-data class Expense(val title: String, val amount: Double, val type: String, val category: String) : Parcelable {
+data class Expense(val title: String, val amount: Double, val type: String, val category: String) :
+    Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString().toString(),
         parcel.readDouble(),
@@ -32,3 +33,4 @@ data class Expense(val title: String, val amount: Double, val type: String, val 
         }
     }
 }
+

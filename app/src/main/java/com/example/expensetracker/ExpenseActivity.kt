@@ -1,4 +1,4 @@
-package com.example.expensetracker
+package com.example.groupfcapstoneproject
 
 import android.app.Activity
 import android.content.DialogInterface
@@ -16,7 +16,7 @@ import android.widget.EditText
 import android.widget.Spinner
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.example.expensetracker.Expense
+import com.example.groupfcapstoneproject.Expense
 
 class ExpenseActivity : AppCompatActivity() {
     private lateinit var etExpenseTitle: EditText
@@ -45,14 +45,44 @@ class ExpenseActivity : AppCompatActivity() {
         spinnerCategory = findViewById(R.id.spinnerCategory)
         btnSave = findViewById(R.id.btnSave)
 
+        // Initialize the spinners
+        val typeAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.type_options,
+            android.R.layout.simple_spinner_item
+        )
+        typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerType.adapter = typeAdapter
+
+        val categoryAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.income_category_options,
+            android.R.layout.simple_spinner_item
+        )
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCategory.adapter = categoryAdapter
+
+        // Get the Expense data if it exists (for edit mode)
         expense = intent.getParcelableExtra(EXTRA_EXPENSE)
         position = intent.getIntExtra(EXTRA_POSITION, -1)
 
         expense?.let {
             etExpenseTitle.setText(it.title)
             etExpenseAmount.setText(it.amount.toString())
+
+            // Set selected type and category in spinners
+            val typePosition = typeAdapter.getPosition(it.type)
+            if (typePosition >= 0) {
+                spinnerType.setSelection(typePosition)
+            }
+
+            val categoryPosition = categoryAdapter.getPosition(it.category)
+            if (categoryPosition >= 0) {
+                spinnerCategory.setSelection(categoryPosition)
+            }
         }
 
+        // Add listeners
         etExpenseTitle.addTextChangedListener(textWatcher)
         etExpenseAmount.addTextChangedListener(textWatcher)
         spinnerType.onItemSelectedListener = spinnerItemSelectedListener
@@ -78,48 +108,16 @@ class ExpenseActivity : AppCompatActivity() {
         override fun afterTextChanged(s: Editable?) {
             val title = etExpenseTitle.text.toString().trim()
             val amount = etExpenseAmount.text.toString().trim()
-            val selectedType = spinnerType.selectedItem.toString()
-            val selectedCategory = spinnerCategory.selectedItem.toString()
-
-            val isTitleValid = !TextUtils.isEmpty(title)
-            val isAmountValid = amount.toDoubleOrNull() != null
-            val isTypeSelected = selectedType == "Income" || selectedType == "Expense"
-
-            btnSave.isEnabled = isTitleValid && isAmountValid && isTypeSelected
+            btnSave.isEnabled = !TextUtils.isEmpty(title) && !TextUtils.isEmpty(amount)
         }
     }
 
     private val spinnerItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-        override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-            val selectedType = parent.getItemAtPosition(position).toString()
-
-            // Update category options based on selected type
-            val categoryOptions = when (selectedType) {
-                "Income" -> resources.getStringArray(R.array.income_category_options)
-                "Expense" -> resources.getStringArray(R.array.expense_category_options)
-                else -> arrayOf("--- Select Category ---")
-            }
-
-            val adapter = ArrayAdapter(
-                this@ExpenseActivity,
-                android.R.layout.simple_spinner_item,
-                categoryOptions
-            )
-            spinnerCategory.adapter = adapter
-
-            val title = etExpenseTitle.text.toString().trim()
-            val amount = etExpenseAmount.text.toString().trim()
-            val selectedCategory = spinnerCategory.selectedItem.toString()
-
-            val isTitleValid = !TextUtils.isEmpty(title)
-            val isAmountValid = amount.toDoubleOrNull() != null
-            val isTypeSelected = selectedType == "Income" || selectedType == "Expense"
-            val isCategorySelected = selectedCategory != "--- Select Category ---"
-
-            btnSave.isEnabled = isTitleValid && isAmountValid && isTypeSelected && isCategorySelected
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            // Handle spinner item selection here
         }
 
-        override fun onNothingSelected(parent: AdapterView<*>) {
+        override fun onNothingSelected(parent: AdapterView<*>?) {
             // Not used
         }
     }
@@ -127,41 +125,39 @@ class ExpenseActivity : AppCompatActivity() {
     private fun saveExpense() {
         val title = etExpenseTitle.text.toString().trim()
         val amount = etExpenseAmount.text.toString().toDouble()
-        val selectedType = spinnerType.selectedItem.toString()
-        val selectedCategory = spinnerCategory.selectedItem.toString()
+        val type = spinnerType.selectedItem.toString()
+        val category = spinnerCategory.selectedItem.toString()
 
-        val expense = Expense(title, amount, selectedType, selectedCategory)
-
-        // Save expense to file using ExpenseDataManager
-        ExpenseDataManager.addExpense(this, expense)
-
-        val resultIntent = Intent()
-        resultIntent.putExtra(EXTRA_EXPENSE, expense)
-        resultIntent.putExtra(EXTRA_POSITION, position)
-        setResult(Activity.RESULT_OK, resultIntent)
+        val newExpense = Expense(title, amount, type, category)
+        val intent = Intent().apply {
+            putExtra(EXTRA_EXPENSE, newExpense)
+        }
+        setResult(Activity.RESULT_OK, intent)
         finish()
     }
 
     private fun updateExpense() {
         val title = etExpenseTitle.text.toString().trim()
         val amount = etExpenseAmount.text.toString().toDouble()
-        val selectedType = spinnerType.selectedItem.toString()
-        val selectedCategory = spinnerCategory.selectedItem.toString()
+        val type = spinnerType.selectedItem.toString()
+        val category = spinnerCategory.selectedItem.toString()
 
-        val expense = Expense(title, amount, selectedType, selectedCategory)
-
-        val resultIntent = Intent()
-        resultIntent.putExtra(EXTRA_EXPENSE, expense)
-        resultIntent.putExtra(EXTRA_POSITION, position)
-        setResult(Activity.RESULT_OK, resultIntent)
+        val updatedExpense = Expense(title, amount, type, category)
+        val intent = Intent().apply {
+            putExtra(EXTRA_EXPENSE, updatedExpense)
+            putExtra(EXTRA_POSITION, position)
+        }
+        setResult(Activity.RESULT_OK, intent)
         finish()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == android.R.id.home) {
-            finish()
-            return true
+        return when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
-        return super.onOptionsItemSelected(item)
     }
 }

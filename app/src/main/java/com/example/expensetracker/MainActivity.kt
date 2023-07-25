@@ -1,4 +1,4 @@
-package com.example.expensetracker
+package com.example.groupfcapstoneproject
 
 import android.app.Activity
 import android.content.DialogInterface
@@ -9,11 +9,13 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -22,10 +24,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var btnAddExpense: AppCompatImageButton
     private lateinit var etSearch: EditText
+    private lateinit var btnFilter: AppCompatImageButton
     private lateinit var expenseList: MutableList<Expense>
     private lateinit var expenseAdapter: ExpenseAdapter
 
     private var filteredExpenseList: MutableList<Expense> = mutableListOf()
+    private var filterOption: String = "All"
 
     companion object {
         private const val ADD_EXPENSE_REQUEST_CODE = 1
@@ -42,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView = findViewById(R.id.recyclerView)
         btnAddExpense = findViewById(R.id.btnAddExpense)
         etSearch = findViewById(R.id.etSearch)
+        btnFilter = findViewById(R.id.btnFilter)
 
         // Initialize the expense list and adapter
         expenseList = ExpenseDataManager.loadExpenses(this).toMutableList()
@@ -63,19 +68,45 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
-                filterExpenses(s.toString())
+                filterExpenses(s.toString(), filterOption)
             }
         })
+
+        btnFilter.setOnClickListener {
+            showFilterDialog()
+        }
     }
 
-    private fun filterExpenses(searchText: String) {
+    private fun showFilterDialog() {
+        val filterOptions = arrayOf("All", "Income", "Expense")
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Filter by")
+            .setSingleChoiceItems(filterOptions, getFilterOptionIndex()) { dialog, which ->
+                filterOption = filterOptions[which]
+                filterExpenses(etSearch.text.toString(), filterOption)
+                dialog.dismiss()
+            }
+            .create()
+            .show()
+    }
+
+    private fun getFilterOptionIndex(): Int {
+        return when (filterOption) {
+            "Income" -> 1
+            "Expense" -> 2
+            else -> 0
+        }
+    }
+
+    private fun filterExpenses(searchText: String, filterOption: String) {
         filteredExpenseList.clear()
-        if (searchText.isBlank()) {
+        if (searchText.isBlank() && filterOption == "All") {
             filteredExpenseList.addAll(expenseList)
         } else {
             val searchQuery = searchText.lowercase()
             expenseList.forEach { expense ->
-                if (expense.title.lowercase().contains(searchQuery)) {
+                if (expense.title.lowercase().contains(searchQuery) &&
+                    (filterOption == "All" || expense.type.equals(filterOption, true))) {
                     filteredExpenseList.add(expense)
                 }
             }
@@ -149,13 +180,30 @@ class MainActivity : AppCompatActivity() {
 
         inner class ExpenseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             private val tvExpenseTitle: TextView = itemView.findViewById(R.id.tvExpenseTitle)
+            private val tvExpenseDetails: TextView = itemView.findViewById(R.id.tvExpenseDetails)
             private val tvExpenseAmount: TextView = itemView.findViewById(R.id.tvExpenseAmount)
             private val btnDeleteExpense: AppCompatImageButton = itemView.findViewById(R.id.btnDeleteExpense)
             private val btnEditExpense: AppCompatImageButton = itemView.findViewById(R.id.btnEditExpense)
 
             fun bind(expense: Expense) {
                 tvExpenseTitle.text = expense.title
-                tvExpenseAmount.text = String.format("%.2f", expense.amount)
+                val typeCategoryText = "Type: ${expense.type} - Category: ${expense.category}"
+                tvExpenseDetails.text = typeCategoryText
+
+                val formattedAmount = String.format("%.2f", expense.amount)
+                val formattedAmountWithSign = if (expense.type == "Income") {
+                    "+$formattedAmount"
+                } else {
+                    "-$formattedAmount"
+                }
+
+                tvExpenseAmount.text = formattedAmountWithSign
+
+                if (expense.type == "Income") {
+                    tvExpenseAmount.setTextColor(ContextCompat.getColor(itemView.context, R.color.green))
+                } else {
+                    tvExpenseAmount.setTextColor(ContextCompat.getColor(itemView.context, R.color.red))
+                }
 
                 btnDeleteExpense.setOnClickListener {
                     val position = adapterPosition
