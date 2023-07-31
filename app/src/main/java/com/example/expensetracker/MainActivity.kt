@@ -25,11 +25,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnAddExpense: AppCompatImageButton
     private lateinit var etSearch: EditText
     private lateinit var btnFilter: AppCompatImageButton
+    private lateinit var btnCalculator: AppCompatImageButton
     private lateinit var expenseList: MutableList<Expense>
     private lateinit var expenseAdapter: ExpenseAdapter
 
     private var filteredExpenseList: MutableList<Expense> = mutableListOf()
     private var filterOption: String = "All"
+
+    private lateinit var calculatorDialog: AlertDialog // Define the calculator dialog
 
     companion object {
         private const val ADD_EXPENSE_REQUEST_CODE = 1
@@ -47,6 +50,7 @@ class MainActivity : AppCompatActivity() {
         btnAddExpense = findViewById(R.id.btnAddExpense)
         etSearch = findViewById(R.id.etSearch)
         btnFilter = findViewById(R.id.btnFilter)
+        btnCalculator = findViewById(R.id.btnCalculator) // Add calculator button reference
 
         // Initialize the expense list and adapter
         expenseList = ExpenseDataManager.loadExpenses(this).toMutableList()
@@ -75,6 +79,49 @@ class MainActivity : AppCompatActivity() {
         btnFilter.setOnClickListener {
             showFilterDialog()
         }
+
+        // Set click listener for calculator button
+        btnCalculator.setOnClickListener {
+            showCalculatorDialog()
+        }
+    }
+
+    // Function to show the calculator dialog
+    private fun showCalculatorDialog() {
+        val totalIncome = calculateTotalAmount("Income")
+        val totalExpense = calculateTotalAmount("Expense")
+        val difference = totalIncome - totalExpense
+
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_calculator, null)
+        val tvTotalIncome: TextView = dialogView.findViewById(R.id.tvTotalIncome)
+        val tvTotalExpense: TextView = dialogView.findViewById(R.id.tvTotalExpense)
+        val tvDifference: TextView = dialogView.findViewById(R.id.tvDifference)
+        val btnClose: TextView = dialogView.findViewById(R.id.btnClose) // Change Button to TextView
+
+        tvTotalIncome.text = "Total Income: $%.2f".format(totalIncome)
+        tvTotalExpense.text = "Total Expense: $%.2f".format(totalExpense)
+        tvDifference.text = "Difference: $%.2f".format(difference)
+
+        calculatorDialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .create()
+
+        btnClose.setOnClickListener {
+            calculatorDialog.dismiss()
+        }
+
+        calculatorDialog.show()
+    }
+
+    // Function to calculate the total amount of a specific type (income or expense)
+    private fun calculateTotalAmount(type: String): Double {
+        var totalAmount = 0.0
+        for (expense in expenseList) {
+            if (expense.type == type) {
+                totalAmount += expense.amount
+            }
+        }
+        return totalAmount
     }
 
     private fun showFilterDialog() {
